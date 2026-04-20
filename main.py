@@ -41,6 +41,4 @@ def analizar_archivo(ruta):
         codigo = f.read()
     analizar(codigo, f"Analizando: {ruta}")
 
-if __name__ == "__main__":
-    args = sys.argv[1:]
-    analizar_archivo("entrada.sql")
+
