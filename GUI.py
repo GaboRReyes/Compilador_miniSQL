@@ -79,7 +79,7 @@ btn_cargar = ctk.CTkButton(
     text="Cargar archivo 📂",
     corner_radius=15,
     fg_color="#3A7FF6",
-    command= cargar_archivo()
+    command= cargar_archivo
 )
 
 #CONSOLA DE COMANDOS
