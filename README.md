@@ -15,8 +15,8 @@ El desarrollo sigue la arquitectura clásica de compiladores, separando cada una
 </p>
 
 <p>
-Actualmente, el sistema incluye la <strong>fase de análisis léxico</strong>, encargada de identificar tokens,
-detectar errores léxicos y construir la tabla de símbolos a partir del código fuente.
+Actualmente, el sistema incluye la <strong>fase de análisis léxico</strong> y una <strong>interfaz gráfica (GUI)</strong>
+que permite interactuar con el compilador de manera visual.
 </p>
 
 <hr>
@@ -33,6 +33,10 @@ detectar errores léxicos y construir la tabla de símbolos a partir del código
 <td>██████████ 100%</td>
 </tr>
 <tr>
+<td>Interfaz gráfica (GUI)</td>
+<td>████████░░ 80%</td>
+</tr>
+<tr>
 <td>Análisis sintáctico</td>
 <td>░░░░░░░░░░ 0%</td>
 </tr>
@@ -45,6 +49,49 @@ detectar errores léxicos y construir la tabla de símbolos a partir del código
 <td>░░░░░░░░░░ 0%</td>
 </tr>
 </table>
+
+<hr>
+
+<h2>Interfaz gráfica (GUI)</h2>
+
+<p>
+Se implementó una interfaz moderna utilizando <strong>CustomTkinter</strong>, con estilo oscuro tipo IDE.
+</p>
+
+<ul>
+<li>Editor de entrada con placeholder dinámico</li>
+<li>Botón para ejecutar consultas manuales</li>
+<li>Carga de archivos desde el explorador del sistema</li>
+<li>Consola de entrada/salida</li>
+<li>Diseño limpio con organización por contenedores</li>
+</ul>
+
+<hr>
+
+<h2>Características de la GUI</h2>
+
+<ul>
+<li>Modo oscuro configurable</li>
+<li>Botones con esquinas redondeadas</li>
+<li>Interacción mediante eventos (FocusIn / FocusOut)</li>
+<li>Simulación de placeholder en campos de texto</li>
+<li>Integración directa con el analizador léxico</li>
+</ul>
+
+<hr>
+
+<h2>Carga de archivos</h2>
+
+<p>
+El sistema permite seleccionar archivos desde el explorador del sistema operativo:
+</p>
+
+<ul>
+<li>Soporte para archivos <code>.sql</code></li>
+<li>Soporte para archivos <code>.txt</code></li>
+<li>Lectura de ruta del archivo seleccionado</li>
+<li>Preparado para integración con el análisis del compilador</li>
+</ul>
 
 <hr>
 
@@ -70,16 +117,16 @@ detectar errores léxicos y construir la tabla de símbolos a partir del código
 <h2>Flujo de procesamiento</h2>
 
 <pre>
-Código fuente (entrada.sql)
-            │
-            ▼
-   Analizador léxico (lexer.py)
-            │
-            ▼
-  Lista de tokens + errores
-            │
-            ▼
-     Tabla de símbolos
+Entrada (GUI o archivo)
+        │
+        ▼
+Interfaz gráfica (CustomTkinter)
+        │
+        ▼
+Analizador léxico (lexer.py)
+        │
+        ▼
+Tokens + errores + tabla de símbolos
 </pre>
 
 <hr>
@@ -90,6 +137,7 @@ Código fuente (entrada.sql)
 proyecto/
 ├── lexer.py
 ├── main.py
+├── GUI.py
 ├── entrada.sql
 └── README.md
 </pre>
@@ -98,9 +146,11 @@ proyecto/
 
 <h2>Ejecución</h2>
 
+<h3>Modo consola</h3>
 <pre><code>python main.py</code></pre>
 
-<p>El programa procesa automáticamente el archivo <code>entrada.sql</code>.</p>
+<h3>Modo interfaz gráfica</h3>
+<pre><code>python GUI.py</code></pre>
 
 <hr>
 
@@ -164,6 +214,7 @@ Carácter desconocido   → @
 
 <ul>
 <li>Python 3</li>
+<li>CustomTkinter (interfaz gráfica)</li>
 <li>Programación orientada a objetos</li>
 <li>Fundamentos de compiladores</li>
 </ul>
@@ -179,7 +230,9 @@ Carácter desconocido   → @
 <h2>Proyección</h2>
 
 <ul>
+<li>Integración completa GUI + análisis léxico</li>
 <li>Análisis sintáctico</li>
 <li>Análisis semántico</li>
-<li>Generación de código intermedio</li>
+<li>Resaltado de sintaxis en el editor</li>
+<li>Consola interactiva tipo IDE</li>
 </ul>
