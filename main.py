@@ -21,6 +21,7 @@ def imprimir_resultado(lx, tokens):
     print(f"\n  {lx.resumen()}")
 
 def analizar(codigo, titulo=""):
+    print("Iniciando análisis léxico...")
     if titulo: sep(titulo)
     lx = AnalizadorLexico(codigo)
     toks = lx.analizar()
@@ -30,6 +31,7 @@ def analizar(codigo, titulo=""):
     if len(lineas) > 6: print("    ...")
     imprimir_resultado(lx, toks)
     print(lx.tabla_simbolos())
+    print("\n  Análisis léxico finalizado.")
     return lx
 
 
