@@ -11,20 +11,8 @@ root.title("Compilador miniSQL")
 root.geometry("700x500")
 root.minsize(500, 400)
 
-placeholder = "Escribe tu consulta miniSQL aquí..."
 color_fondo = "#191742"
 
-# Función cuando haces click
-def quitar_placeholder(event):
-    if consola.get("1.0", "end").strip() == placeholder:
-        consola.delete("1.0", "end")
-        consola.configure(text_color="white")
-
-# Función cuando pierde foco
-def poner_placeholder(event):
-    if consola.get("1.0", "end").strip() == "":
-        consola.insert("1.0", placeholder)
-        consola.configure(text_color="gray")
 
 def cargar_archivo():
     ruta = filedialog.askopenfilename(
@@ -76,7 +64,7 @@ btn_ejecutar = ctk.CTkButton(
 #BOTON CARGAR
 btn_cargar = ctk.CTkButton(
     botones_frame,
-    text="Cargar archivo 📂",
+    text="Cargar archivo",
     corner_radius=15,
     fg_color="#3A7FF6",
     command= cargar_archivo
@@ -90,19 +78,24 @@ consola = ctk.CTkTextbox(
     font=("Courier New", 11)
 )
 
+#Texto de ayuda en consola
+ayudaTxt = ctk.CTkLabel(
+    frame,
+    text="Escribe tu consulta en la consola ↓",
+    font=("Courier New", 12),
+    text_color="white"
+)
+
 titulo.pack(anchor="w", padx=15, pady=(10, 0))
 descripcion.pack(anchor="w", padx=15, pady=(0, 10)) 
 botones_frame.pack(anchor="w", padx=15, pady=(0, 20))
 btn_ejecutar.pack(side="left", padx=10)
 btn_cargar.pack(side="left", padx=10)
+ayudaTxt.pack(anchor="w", padx=15, pady=(0, 5))
 consola.pack(fill="x", padx=15, pady=5)
 
 # Texto inicial en consola
-consola.insert("1.0", placeholder)
 consola.configure(text_color="gray")
 
-# Eventos
-consola.bind("<FocusIn>", quitar_placeholder)
-consola.bind("<FocusOut>", poner_placeholder)
 
 root.mainloop()
