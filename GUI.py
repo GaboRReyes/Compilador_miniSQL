@@ -1,9 +1,9 @@
 import os
 import sys
-
 import customtkinter as ctk
 from tkinter import filedialog
 from main import analizar
+from ejecutor import ejecutar_minisql
 
 # Configuración inicial de customtkinter
 ctk.set_appearance_mode("dark")
@@ -11,12 +11,12 @@ ctk.set_appearance_mode("dark")
 # Ventana principal
 root = ctk.CTk()
 root.title("Compilador miniSQL")
-root.geometry("700x500")
+root.geometry("600x500")
 root.minsize(500, 400)
 root.update_idletasks()
-x = (root.winfo_screenwidth()  // 2) - (700 // 2)
+x = (root.winfo_screenwidth()  // 2) - (600 // 2)
 y = (root.winfo_screenheight() // 2) - (500 // 2)
-root.geometry(f"{700}x{500}+{x}+{y}")
+root.geometry(f"{600}x{500}+{x}+{y}")
 
 color_fondo = "#191742"
 
@@ -92,7 +92,14 @@ def abrir_resultados(codigo=None):
     cuadro_tokens.insert("1.0", lx.resumen() + "\n\n" + "\n".join(lineas_tokens))
     cuadro_errores.insert("1.0", "\n".join(lx.errores) if lx.errores else "Sin errores léxicos")
     cuadro_tabla.insert("1.0", lx.tabla_simbolos())
-    cuadro_resultados.insert("1.0", "Resultados de la consulta")
+    try:
+        if lx.errores:
+            resultado_sql = "Error léxico, no se ejecuta SQL"
+        else:
+            resultado_sql = ejecutar_minisql(codigo)
+    except Exception as e:
+        resultado_sql = f"Error al ejecutar SQL:\n{e}"
+    cuadro_resultados.insert("1.0", resultado_sql)
 
     # Hacer los cuadros de solo lectura
     for caja in (cuadro_codigo, cuadro_tokens, cuadro_errores, cuadro_tabla, cuadro_analisis, cuadro_resultados):
