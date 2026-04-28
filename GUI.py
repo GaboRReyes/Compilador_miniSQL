@@ -93,7 +93,7 @@ def abrir_resultados(codigo=None):
 
     cuadro_codigo.insert("1.0", codigo)
     cuadro_tokens.insert("1.0", lx.resumen() + "\n\n" + "\n".join(lineas_tokens))
-    cuadro_errores.insert("1.0", "\n".join(lx.errores) if lx.errores else "Sin errores léxicos")
+    cuadro_analisis.insert("1.0", "\n".join(f"[{cod}] {msg}" for cod, msg in parser.errores))
     cuadro_tabla.insert("1.0", lx.tabla_simbolos())
 
     try:
