@@ -60,7 +60,7 @@ def abrir_resultados(codigo=None):
     main_frame = ctk.CTkFrame(ventana)
     main_frame.pack(fill="both", expand=True, padx=10, pady=10)
 
-    main_frame.grid_rowconfigure((0, 1), weight=1)
+    main_frame.grid_rowconfigure((0, 1, 2), weight=1)
     main_frame.grid_columnconfigure((0, 1), weight=1)
 
     def hacer_cuadro(row, col, titulo_label):
@@ -93,25 +93,27 @@ def abrir_resultados(codigo=None):
 
     cuadro_codigo.insert("1.0", codigo)
     cuadro_tokens.insert("1.0", lx.resumen() + "\n\n" + "\n".join(lineas_tokens))
-    cuadro_analisis.insert("1.0", "\n".join(f"[{cod}] {msg}" for cod, msg in parser.errores))
     cuadro_tabla.insert("1.0", lx.tabla_simbolos())
 
     try:
         if lx.errores:
-            cuadro_analisis.insert("1.0", "Error léxico")
+            cuadro_errores.insert("1.0", "\n".join(lx.errores))
+            cuadro_analisis.insert("1.0", "No se realizó análisis sintáctico por errores léxicos")
             resultado_sql = ""
         else:
+            cuadro_errores.insert("1.0", "Sin errores léxicos")
+            
             #===ANALIZADOR SINTÁCTICO===#
             parser = AnalizadorSintactico(lx.tokens)
-
             arbol = parser.analizar()
 
             if parser.errores:
-                cuadro_analisis.insert("1.0", "\n".join(parser.errores))
+                errores_sintacticos = "\n".join(f"[{cod}] {msg}" for cod, msg in parser.errores)
+                cuadro_errores.insert("end", "\n\n" + errores_sintacticos)
+                cuadro_analisis.insert("1.0", "Errores sintácticos detectados")
                 resultado_sql = ""
             else:
                 texto_arbol = ""
-
                 for nodo in arbol:
                     texto_arbol += arbol_a_texto(nodo)
 
@@ -119,6 +121,7 @@ def abrir_resultados(codigo=None):
                 resultado_sql = ejecutar_minisql(codigo)
     except Exception as e:
         resultado_sql = f"Error al ejecutar SQL:\n{e}"
+    
     cuadro_resultados.insert("1.0", resultado_sql)
 
     #===Hacer los cuadros de solo lectura===#
@@ -200,6 +203,5 @@ consola.pack(fill="x", padx=15, pady=5)
 
 #===Texto inicial en consola===#
 consola.configure(text_color="gray")
-
 
 root.mainloop()
