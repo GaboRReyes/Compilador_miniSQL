@@ -236,3 +236,33 @@ Carácter desconocido   → @
 <li>Resaltado de sintaxis en el editor</li>
 <li>Consola interactiva tipo IDE</li>
 </ul>
+
+<hr>
+
+<h2>Traducción MiniSQL → SQL</h2>
+
+<p>
+El sistema incluye un traductor que convierte instrucciones escritas en español (MiniSQL)
+a sentencias SQL estándar compatibles con MySQL.
+</p>
+
+<h3>Ejemplo</h3>
+
+<pre><code>
+SELECCIONAR * DESDE alumnos DONDE edad > 18;
+</code></pre>
+
+<p><strong>Se traduce a:</strong></p>
+
+<pre><code>
+SELECT * FROM alumnos WHERE edad > 18;
+</code></pre>
+
+<h3>Características del traductor</h3>
+
+<ul>
+<li>Uso de diccionario de equivalencias</li>
+<li>Tokenización con expresiones regulares</li>
+<li>Conversión de palabras reservadas</li>
+<li>Limpieza de espacios y sintaxis final</li>
+</ul>

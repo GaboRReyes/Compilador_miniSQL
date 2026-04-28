@@ -1,22 +1,25 @@
 import os
 import sys
-
 import customtkinter as ctk
 from tkinter import filedialog
 from main import analizar
+from ejecutor import ejecutar_minisql
+from sintactico import AnalizadorSintactico
+from utils_arbol import arbol_a_texto
 
-# Configuración inicial de customtkinter
+
+#===Configuración inicial de customtkinter===#
 ctk.set_appearance_mode("dark")
 
-# Ventana principal
+#===Ventana principal===#
 root = ctk.CTk()
 root.title("Compilador miniSQL")
-root.geometry("700x500")
+root.geometry("600x500")
 root.minsize(500, 400)
 root.update_idletasks()
-x = (root.winfo_screenwidth()  // 2) - (700 // 2)
+x = (root.winfo_screenwidth()  // 2) - (600 // 2)
 y = (root.winfo_screenheight() // 2) - (500 // 2)
-root.geometry(f"{700}x{500}+{x}+{y}")
+root.geometry(f"{600}x{500}+{x}+{y}")
 
 color_fondo = "#191742"
 
@@ -53,7 +56,7 @@ def abrir_resultados(codigo=None):
     y = (ventana.winfo_screenheight() // 2) - (800 // 2)
     ventana.geometry(f"{1000}x{800}+{x}+{y}")
 
-    # ===== CONTENEDOR PRINCIPAL =====
+    #===CONTENEDOR PRINCIPAL===#
     main_frame = ctk.CTkFrame(ventana)
     main_frame.pack(fill="both", expand=True, padx=10, pady=10)
 
@@ -77,10 +80,10 @@ def abrir_resultados(codigo=None):
     cuadro_analisis   = hacer_cuadro(2, 0, "Análisis")
     cuadro_resultados = hacer_cuadro(2, 1, "Resultados")
 
-    # ===== EJECUTAR ANÁLISIS =====
+    # === EJECUTAR ANÁLISIS ===#
     lx = analizar(codigo, "Consulta desde GUI")
 
-    # Construir lista de tokens como texto
+    #===Construir lista de tokens como texto===#
     lineas_tokens = []
     for i, tok in enumerate(lx.tokens, 1):
         from lexer import Token
@@ -92,13 +95,37 @@ def abrir_resultados(codigo=None):
     cuadro_tokens.insert("1.0", lx.resumen() + "\n\n" + "\n".join(lineas_tokens))
     cuadro_errores.insert("1.0", "\n".join(lx.errores) if lx.errores else "Sin errores léxicos")
     cuadro_tabla.insert("1.0", lx.tabla_simbolos())
-    cuadro_resultados.insert("1.0", "Resultados de la consulta")
 
-    # Hacer los cuadros de solo lectura
+    try:
+        if lx.errores:
+            cuadro_analisis.insert("1.0", "Error léxico")
+            resultado_sql = ""
+        else:
+            #===ANALIZADOR SINTÁCTICO===#
+            parser = AnalizadorSintactico(lx.tokens)
+
+            arbol = parser.analizar()
+
+            if parser.errores:
+                cuadro_analisis.insert("1.0", "\n".join(parser.errores))
+                resultado_sql = ""
+            else:
+                texto_arbol = ""
+
+                for nodo in arbol:
+                    texto_arbol += arbol_a_texto(nodo)
+
+                cuadro_analisis.insert("1.0", texto_arbol)
+                resultado_sql = ejecutar_minisql(codigo)
+    except Exception as e:
+        resultado_sql = f"Error al ejecutar SQL:\n{e}"
+    cuadro_resultados.insert("1.0", resultado_sql)
+
+    #===Hacer los cuadros de solo lectura===#
     for caja in (cuadro_codigo, cuadro_tokens, cuadro_errores, cuadro_tabla, cuadro_analisis, cuadro_resultados):
         caja.configure(state="disabled")
 
-    # ===== BOTÓN REGRESAR =====
+    #===BOTÓN REGRESAR===#
     def regresar():
         ventana.destroy()
         root.deiconify()
@@ -106,14 +133,14 @@ def abrir_resultados(codigo=None):
     ctk.CTkButton(ventana, text="⬅ Regresar", command=regresar).pack(pady=10)
 
 
-# CONTENEDOR
+#===CONTENEDOR===#
 frame = ctk.CTkFrame(root, fg_color=color_fondo)
 frame.pack(fill="both", expand=True)
 
-#CONTENEDOR DE BOTONES
+#===CONTENEDOR DE BOTONES===#
 botones_frame = ctk.CTkFrame(frame, fg_color="transparent")
 
-#TITULO
+#===TITULO===#
 titulo = ctk.CTkLabel(
     frame,
     text="Compilador miniSQL",
@@ -121,7 +148,7 @@ titulo = ctk.CTkLabel(
     text_color="white"
 )
 
-#DESCRIPCION
+#===DESCRIPCION===#
 descripcion = ctk.CTkLabel(
     frame,
     text="Escribe o carga tu consulta miniSQL",
@@ -129,7 +156,7 @@ descripcion = ctk.CTkLabel(
     text_color="white"
 )
 
-#BOTON EJECUTAR
+#===BOTON EJECUTAR===#
 btn_ejecutar = ctk.CTkButton(
     botones_frame,
     text="Ejecutar ▶",
@@ -138,7 +165,7 @@ btn_ejecutar = ctk.CTkButton(
     command=lambda: abrir_resultados()
 )
 
-#BOTON CARGAR
+#===BOTON CARGAR===#
 btn_cargar = ctk.CTkButton(
     botones_frame,
     text="Cargar archivo",
@@ -147,7 +174,7 @@ btn_cargar = ctk.CTkButton(
     command= cargar_archivo
 )
 
-#CONSOLA DE COMANDOS
+#===CONSOLA DE COMANDOS===#
 consola = ctk.CTkTextbox(
     frame,
     width=600,
@@ -155,7 +182,7 @@ consola = ctk.CTkTextbox(
     font=("Courier New", 11)
 )
 
-#Texto de ayuda en consola
+#===Texto de ayuda en consola===#
 ayudaTxt = ctk.CTkLabel(
     frame,
     text="Escribe tu consulta en la consola ↓",
@@ -171,7 +198,7 @@ btn_cargar.pack(side="left", padx=10)
 ayudaTxt.pack(anchor="w", padx=15, pady=(0, 5))
 consola.pack(fill="x", padx=15, pady=5)
 
-# Texto inicial en consola
+#===Texto inicial en consola===#
 consola.configure(text_color="gray")
 
 
