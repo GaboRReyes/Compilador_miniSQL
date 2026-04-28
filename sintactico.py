@@ -1,14 +1,21 @@
 from lexer import Token
 
+ERR_FIN_ENTRADA       = -11
+ERR_TOKEN_INESPERADO  = -12
+ERR_IDENTIFICADOR     = -13
+ERR_SENTENCIA_INVALIDA = -14
+ERR_VALOR_FALTANTE    = -15
+ERR_OPERADOR_FALTANTE = -16
+
 #===NODO DEL ÁRBOL===#
 class Nodo:
     def __init__(self, tipo, valor=None):
-        self.tipo = tipo #tipo de nodo (ej: SELECT, TABLA, CONDICION)
-        self.valor = valor #valor asociado (ej: nombre de tabla, columna, etc)
-        self.hijos = [] #lista de nodos hijos
-    #===AGREGAR HIJO (CREACIÓN DE ARBOL)===#
+        self.tipo = tipo
+        self.valor = valor
+        self.hijos = []
+
     def agregar(self, nodo):
-        if nodo:  
+        if nodo:
             self.hijos.append(nodo)
 
 #===ANALIZADOR SINTÁCTICO===#
@@ -16,7 +23,7 @@ class AnalizadorSintactico:
     def __init__(self, tokens):
         self.tokens = tokens
         self.i = 0
-        self.errores = []
+        self.errores = []  # Lista de tuplas (codigo, mensaje)
 
     def actual(self):
         return self.tokens[self.i] if self.i < len(self.tokens) else None
@@ -35,13 +42,11 @@ class AnalizadorSintactico:
         tok = self.actual()
 
         if not tok:
-            self.errores.append(f"Se esperaba '{palabra}' pero llegó fin de entrada")
+            self.errores.append((ERR_FIN_ENTRADA, f"Se esperaba '{palabra}' pero llegó fin de entrada"))
             return False
 
         if tok.lexema.lower() != palabra.lower():
-            self.errores.append(
-                f"Se esperaba '{palabra}' pero llegó '{tok.lexema}'"
-            )
+            self.errores.append((ERR_TOKEN_INESPERADO, f"Se esperaba '{palabra}' pero llegó '{tok.lexema}'"))
             return False
 
         self.avanzar()
@@ -50,14 +55,18 @@ class AnalizadorSintactico:
     def esperar_identificador(self):
         tok = self.actual()
 
-        if tok and Token.nombre(tok.tipo) == "IDENTIFICADOR":
+        if not tok:
+            self.errores.append((ERR_FIN_ENTRADA, "Se esperaba un IDENTIFICADOR pero llegó fin de entrada"))
+            return None
+
+        if Token.nombre(tok.tipo) == "IDENTIFICADOR":
             self.avanzar()
             return tok.lexema
 
-        self.errores.append("Se esperaba un IDENTIFICADOR")
+        self.errores.append((ERR_IDENTIFICADOR, f"Se esperaba un IDENTIFICADOR pero llegó '{tok.lexema}'"))
         return None
-    #===INICIO===#
 
+    #===INICIO===#
     def analizar(self):
         arbol = []
 
@@ -69,7 +78,6 @@ class AnalizadorSintactico:
 
         return arbol
 
-
     def sentencia(self):
         tok = self.actual()
         if not tok:
@@ -78,20 +86,20 @@ class AnalizadorSintactico:
         palabra = tok.lexema.lower()
 
         reglas = {
-            "usar": self.usar,
+            "usar":       self.usar,
             "seleccionar": self.seleccionar,
-            "insertar": self.insertar,
-            "borrar": self.borrar,
-            "crear": self.crear,
-            "eliminar": self.eliminar,
-            "mostrar": self.mostrar,
+            "insertar":   self.insertar,
+            "borrar":     self.borrar,
+            "crear":      self.crear,
+            "eliminar":   self.eliminar,
+            "mostrar":    self.mostrar,
             "actualizar": self.actualizar
         }
 
         if palabra in reglas:
             return reglas[palabra]()
 
-        self.errores.append(f"Sentencia no válida: '{tok.lexema}'")
+        self.errores.append((ERR_SENTENCIA_INVALIDA, f"Sentencia no válida: '{tok.lexema}'"))
         self.avanzar()
         return None
 
@@ -114,7 +122,7 @@ class AnalizadorSintactico:
 
         nodo.agregar(Nodo("BD", nombre))
         return nodo
-    
+
     def actualizar(self):
         nodo = Nodo("UPDATE")
 
@@ -142,7 +150,7 @@ class AnalizadorSintactico:
 
             tok = self.actual()
             if not tok:
-                self.errores.append("Se esperaba un valor")
+                self.errores.append((ERR_VALOR_FALTANTE, "Se esperaba un valor en la asignación pero llegó fin de entrada"))
                 return None
 
             asignaciones.agregar(Nodo("ASIGNACION", f"{col} = {tok.lexema}"))
@@ -198,7 +206,6 @@ class AnalizadorSintactico:
 
         return nodo
 
-
     def insertar(self):
         nodo = Nodo("INSERT")
 
@@ -231,7 +238,6 @@ class AnalizadorSintactico:
 
         return nodo
 
-
     def borrar(self):
         nodo = Nodo("DELETE")
 
@@ -258,7 +264,6 @@ class AnalizadorSintactico:
 
         return nodo
 
-
     def crear(self):
         nodo = Nodo("CREATE")
 
@@ -282,13 +287,12 @@ class AnalizadorSintactico:
 
         return nodo
 
-
     def eliminar(self):
         nodo = Nodo("DROP")
 
         if not self.esperar("eliminar"):
             return None
-        
+
         if not self.esperar("tabla"):
             return None
 
@@ -302,7 +306,6 @@ class AnalizadorSintactico:
             return None
 
         return nodo
-
 
     def mostrar(self):
         nodo = Nodo("SHOW")
@@ -318,7 +321,6 @@ class AnalizadorSintactico:
 
         return nodo
 
-
     def condicion(self):
         nodo = Nodo("CONDICION")
 
@@ -330,7 +332,7 @@ class AnalizadorSintactico:
 
         tok = self.actual()
         if not tok:
-            self.errores.append("Se esperaba operador")
+            self.errores.append((ERR_OPERADOR_FALTANTE, "Se esperaba un operador en la condición pero llegó fin de entrada"))
             return None
 
         nodo.agregar(Nodo("OPERADOR", tok.lexema))
@@ -338,7 +340,7 @@ class AnalizadorSintactico:
 
         tok = self.actual()
         if not tok:
-            self.errores.append("Se esperaba valor")
+            self.errores.append((ERR_VALOR_FALTANTE, "Se esperaba un valor en la condición pero llegó fin de entrada"))
             return None
 
         nodo.agregar(Nodo("VALOR", tok.lexema))
