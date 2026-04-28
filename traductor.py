@@ -2,7 +2,7 @@ from lexer import AnalizadorLexico
 
 def traducir_minisql(tokens):
 
-    #======TRADUCCIONES (DICCIONARIO DE PALABRAS MINISQL A MySQL)======
+    #===TRADUCCIONES (DICCIONARIO DE PALABRAS MINISQL A MySQL)===#
     traducciones = {
         "usar": "USE",
         "crear": "CREATE",
@@ -15,10 +15,11 @@ def traducir_minisql(tokens):
         "mostrar": "SHOW",
         "conceder": "GRANT",
         "revocar": "REVOKE",
+        "establecer": "SET",
 
         "tablas": "TABLES",
         "tabla": "TABLE",
-        "base_de_datos": "DATABASE",
+        "base_de_datos": "DATABASES",
         "base": "DATABASE",
         "estructura": "DESCRIBE",
 

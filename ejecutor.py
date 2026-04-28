@@ -10,12 +10,11 @@ def ejecutar_minisql(codigo):
     if lx.errores:
         return "Error léxico, no se ejecuta SQL"
 
-    # 2. TRADUCTOR usando tokens
     sql = traducir_minisql(lx.tokens)
 
     conexion = obtener_conexion()
     cursor = conexion.cursor()
-
+    #===Ejecutar SQL traducido a MySQL===#
     try:
         consultas = sql.split(";")
         resultado_final = ""
@@ -25,23 +24,23 @@ def ejecutar_minisql(codigo):
             if consulta == "":
                 continue
 
-            try:
-                print(f"Ejecutando: [{consulta}]")
+            print(f"Ejecutando: [{consulta}]")
 
-                cursor.execute(consulta)
+            cursor.execute(consulta)
+            #===Consultas que devuelven resultados===#
+            if consulta.upper().startswith(("SELECT", "SHOW", "DESCRIBE")):
+                resultados = cursor.fetchall()
+                resultado_final += f"\n>> {consulta}\n"
 
-                if consulta.upper().startswith(("SELECT", "SHOW", "DESCRIBE")):
-                    resultados = cursor.fetchall()
-                    resultado_final += f"\n>> {consulta}\n"
-
-                    for fila in resultados:
-                        resultado_final += " | ".join(str(x) for x in fila) + "\n"
-
-            except Exception as e:
-                return f"Error en consulta: '{consulta}'\n{e}"
+                for fila in resultados:
+                    resultado_final += " | ".join(str(x) for x in fila) + "\n"
 
         conexion.commit()
-        return resultado_final if resultado_final else "Consultas ejecutadas correctamente"
+
+        if resultado_final.strip() == "":
+            return "Consultas ejecutadas correctamente"
+
+        return resultado_final
 
     finally:
         conexion.close()
