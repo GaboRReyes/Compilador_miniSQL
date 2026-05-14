@@ -84,7 +84,7 @@ class Token:
         1029:"A",1030:"PARA",1031:"IDENTIFICADO_POR",
         1032:"ENTEROS",1033:"CARACTERES",1034:"DECIMALES",1035:"NO_NULO",
         1036:"CONTRASEÑA",1037:"PERMISOS",1038:"TODOS_PRIVILEGIOS",
-        1039:"Y",1040:"O",
+        1039:"Y",1040:"O",1041:"TABLAS",
         2001:"OP_IGUAL",2002:"OP_DIFERENTE",2003:"OP_MENOR",
         2004:"OP_MAYOR",2005:"OP_MENOR_EQ",2006:"OP_MAYOR_EQ",
         2007:"OP_SUMA",2008:"OP_RESTA",2009:"OP_MULT",2010:"OP_DIV",
@@ -122,7 +122,7 @@ PALABRAS_RESERVADAS = {
     "decimales":Token.DECIMALES,"no_nulo":Token.NO_NULO,
     "contraseña":Token.CONTRASEÑA,"permisos":Token.PERMISOS,
     "todos_privilegios":Token.TODOS_PRIVILEGIOS,
-    "y":Token.Y,"o":Token.O,
+    "y":Token.Y,"o":Token.O,"tablas":Token.TABLAS,
 }
 
 
