@@ -43,6 +43,7 @@ class Token:
     TODOS_PRIVILEGIOS = 1038
     Y               = 1039
     O               = 1040
+    TABLAS          = 1041
 
     OP_IGUAL        = 2001
     OP_DIFERENTE    = 2002
