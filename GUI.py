@@ -11,7 +11,7 @@ from utils_arbol import arbol_a_texto
 from Conexion    import obtener_conexion
  
 ESQUEMA = {}
- 
+
 # PALETA DE COLORES POR TIPO DE TOKEN
 COLOR_RESERVADA    = "#4FC3F7"   # palabras reservadas → cian
 COLOR_OPERADOR     = "#FFB74D"   # operadores          → naranja
@@ -44,7 +44,7 @@ ALL_TAGS = list(COLOR_TAG.values())
  
 def color_de_token(tipo: int) -> str:
     if Token.es_error(tipo):      return COLOR_ERROR
-    if 1001 <= tipo <= 1040:      return COLOR_RESERVADA
+    if 1001 <= tipo <= 1050:      return COLOR_RESERVADA
     if 2001 <= tipo <= 2010:      return COLOR_OPERADOR
     if 3001 <= tipo <= 3005:      return COLOR_SIMBOLO
     if tipo >= 9000:              return COLOR_CADENA
