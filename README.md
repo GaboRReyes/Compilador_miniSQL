@@ -15,8 +15,10 @@ El desarrollo sigue la arquitectura clásica de compiladores, separando cada una
 </p>
 
 <p>
-Actualmente, el sistema incluye la <strong>fase de análisis léxico</strong> y una <strong>interfaz gráfica (GUI)</strong>
-que permite interactuar con el compilador de manera visual.
+Actualmente, el sistema incluye la <strong>fase de análisis léxico</strong>, <strong>análisis sintáctico</strong>,
+<strong>análisis semántico</strong> (parcial), <strong>generación de código</strong> (parcial) y una
+<strong>interfaz gráfica (GUI)</strong> que permite interactuar con el compilador de manera visual,
+con resaltado de sintaxis en tiempo real.
 </p>
 
 <hr>
@@ -34,19 +36,19 @@ que permite interactuar con el compilador de manera visual.
 </tr>
 <tr>
 <td>Interfaz gráfica (GUI)</td>
-<td>████████░░ 80%</td>
+<td>██████████ 100%</td>
 </tr>
 <tr>
 <td>Análisis sintáctico</td>
-<td>░░░░░░░░░░ 0%</td>
+<td>██████████ 100%</td>
 </tr>
 <tr>
 <td>Análisis semántico</td>
-<td>░░░░░░░░░░ 0%</td>
+<td>█████░░░░░ 50%</td>
 </tr>
 <tr>
 <td>Generación de código</td>
-<td>░░░░░░░░░░ 0%</td>
+<td>████████░░ 80%</td>
 </tr>
 </table>
 
@@ -55,15 +57,17 @@ que permite interactuar con el compilador de manera visual.
 <h2>Interfaz gráfica (GUI)</h2>
 
 <p>
-Se implementó una interfaz moderna utilizando <strong>CustomTkinter</strong>, con estilo oscuro tipo IDE.
+Se implementó una interfaz moderna utilizando <strong>CustomTkinter</strong> y <strong>tkinter nativo</strong>,
+con estilo oscuro tipo IDE.
 </p>
 
 <ul>
-<li>Editor de entrada con placeholder dinámico</li>
+<li>Todo en una sola ventana — consola de entrada y cinco paneles de resultado en la misma pantalla</li>
+<li>Resaltado de sintaxis en tiempo real mientras se escribe la consulta</li>
 <li>Botón para ejecutar consultas manuales</li>
-<li>Carga de archivos desde el explorador del sistema</li>
-<li>Consola de entrada/salida</li>
-<li>Diseño limpio con organización por contenedores</li>
+<li>Carga de archivos desde el explorador del sistema (<code>.sql</code> y <code>.txt</code>)</li>
+<li>Atajo de teclado <code>Ctrl+Enter</code> para ejecutar</li>
+<li>Cinco paneles de resultado: Tokens, Errores, Tabla de símbolos, Árbol sintáctico y Resultados</li>
 </ul>
 
 <hr>
@@ -73,10 +77,32 @@ Se implementó una interfaz moderna utilizando <strong>CustomTkinter</strong>, c
 <ul>
 <li>Modo oscuro configurable</li>
 <li>Botones con esquinas redondeadas</li>
-<li>Interacción mediante eventos (FocusIn / FocusOut)</li>
-<li>Simulación de placeholder en campos de texto</li>
-<li>Integración directa con el analizador léxico</li>
+<li>Fuente monoespaciada ampliada (13pt) para mayor legibilidad</li>
+<li>Consola de entrada <strong>Consulta SQL</strong> con coloreado token a token en tiempo real</li>
+<li>Integración directa con el analizador léxico y sintáctico</li>
 </ul>
+
+<hr>
+
+<h2>Resaltado de sintaxis</h2>
+
+<p>Cada tipo de token recibe un color distinto tanto en la consola de entrada como en el panel de Tokens:</p>
+
+<table>
+<tr>
+<th>Tipo de token</th>
+<th>Rango de códigos</th>
+<th>Color</th>
+</tr>
+<tr><td>Palabras reservadas</td><td>1001–1040</td><td>🔵 Cian &nbsp;<code>#4FC3F7</code></td></tr>
+<tr><td>Operadores</td><td>2001–2010</td><td>🟠 Naranja &nbsp;<code>#FFB74D</code></td></tr>
+<tr><td>Símbolos</td><td>3001–3005</td><td>🟡 Amarillo &nbsp;<code>#FFF176</code></td></tr>
+<tr><td>Identificador</td><td>6000+</td><td>⚪ Blanco &nbsp;<code>#FFFFFF</code></td></tr>
+<tr><td>Entero</td><td>7000+</td><td>🟢 Verde lima &nbsp;<code>#AED581</code></td></tr>
+<tr><td>Flotante</td><td>8000+</td><td>🩵 Verde menta &nbsp;<code>#80CBC4</code></td></tr>
+<tr><td>Cadena de texto</td><td>9000+</td><td>🔴 Coral &nbsp;<code>#EF9A9A</code></td></tr>
+<tr><td>Error léxico</td><td>(flag)</td><td>🔴 Rojo &nbsp;<code>#FF5252</code></td></tr>
+</table>
 
 <hr>
 
@@ -120,13 +146,25 @@ El sistema permite seleccionar archivos desde el explorador del sistema operativ
 Entrada (GUI o archivo)
         │
         ▼
-Interfaz gráfica (CustomTkinter)
+Consola "Consulta SQL" — editor con resaltado en tiempo real
         │
         ▼
 Analizador léxico (lexer.py)
         │
         ▼
 Tokens + errores + tabla de símbolos
+        │
+        ▼
+Analizador sintáctico (sintactico.py)
+        │
+        ▼
+Árbol sintáctico
+        │
+        ▼
+Ejecutor / Generación de código (ejecutor.py)
+        │
+        ▼
+Resultado final
 </pre>
 
 <hr>
@@ -137,6 +175,9 @@ Tokens + errores + tabla de símbolos
 proyecto/
 ├── lexer.py
 ├── main.py
+├── sintactico.py
+├── ejecutor.py
+├── utils_arbol.py
 ├── GUI.py
 ├── entrada.sql
 └── README.md
@@ -191,10 +232,11 @@ SELECCIONAR 'cadena sin cerrar;
 <h2>Salida del sistema</h2>
 
 <ul>
-<li>Lista de tokens (tipo, lexema, posición)</li>
-<li>Reporte de errores léxicos</li>
+<li>Lista de tokens coloreada (tipo, lexema, posición)</li>
+<li>Reporte de errores léxicos y sintácticos</li>
 <li>Tabla de símbolos</li>
-<li>Resumen de ejecución</li>
+<li>Árbol sintáctico textual</li>
+<li>Resultado de ejecución / traducción a SQL estándar</li>
 </ul>
 
 <hr>
@@ -215,6 +257,7 @@ Carácter desconocido   → @
 <ul>
 <li>Python 3</li>
 <li>CustomTkinter (interfaz gráfica)</li>
+<li>tkinter nativo (editor con resaltado de sintaxis)</li>
 <li>Programación orientada a objetos</li>
 <li>Fundamentos de compiladores</li>
 </ul>
@@ -230,10 +273,8 @@ Carácter desconocido   → @
 <h2>Proyección</h2>
 
 <ul>
-<li>Integración completa GUI + análisis léxico</li>
-<li>Análisis sintáctico</li>
-<li>Análisis semántico</li>
-<li>Resaltado de sintaxis en el editor</li>
+<li>Completar análisis semántico</li>
+<li>Completar generación de código</li>
 <li>Consola interactiva tipo IDE</li>
 </ul>
 
