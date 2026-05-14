@@ -1,15 +1,3 @@
-"""
-traductor.py — Traduce tokens MiniSQL a SQL estándar (MySQL)
-CORRECCIONES:
-  - "y"  → AND  (ya estaba, pero ahora llega correctamente desde el sintáctico)
-  - "o"  → OR   (ídem)
-  - "todo" → *  (corrección: antes salía como cadena "TODO")
-  - Soporte para ORDENAR ASCENDENTE / DESCENDENTE → ORDER BY ASC/DESC
-  - Soporte para LIMITE N → LIMIT N
-  - AGRUPAR → GROUP BY
-  - Limpieza de espacios antes de comas y punto y coma
-"""
-
 from lexer import Token
 
 # Diccionario completo de palabras reservadas MiniSQL → SQL estándar
