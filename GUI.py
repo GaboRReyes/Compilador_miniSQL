@@ -1,6 +1,7 @@
 import os
+import webbrowser
 import customtkinter as ctk
-from tkinter import filedialog
+from tkinter import filedialog, font
 import tkinter as tk
  
 from lexer       import AnalizadorLexico, Token
@@ -75,6 +76,10 @@ root.update_idletasks()
 sw, sh = root.winfo_screenwidth(), root.winfo_screenheight()
 root.geometry(f"1400x900+{(sw-1400)//2}+{(sh-900)//2}")
  
+ #Enlace a la documentacion en Vercel
+def abrir_web(event=None):
+    webbrowser.open("https://compilador-mini-sql.vercel.app/") 
+
 # HELPERS DE CONSTRUCCIÓN DE UI 
 def hacer_cuadro(parent, titulo_label, row, col, colspan=1):
     """Crea un panel con título y CTkTextbox interno."""
@@ -439,8 +444,12 @@ ctk.CTkLabel(header, text="Compilador  miniSQL",
              font=FONT_TITLE, text_color=COLOR_ACCENT).pack(side="left", padx=10)
  
 btn_frame = ctk.CTkFrame(header, fg_color="transparent")
-btn_frame.pack(side="right", padx=10)
+btn_frame.pack(side="right", padx=10) 
  
+ctk.CTkButton(btn_frame, text="Visitar documentacion",
+              corner_radius=15, fg_color="#F63A3A",
+              font=FONT_SUB, command=abrir_web).pack(side="left", padx=6)
+
 ctk.CTkButton(btn_frame, text="Cargar archivo",
               corner_radius=15, fg_color="#3A7FF6",
               font=FONT_SUB, command=cargar_archivo).pack(side="left", padx=6)
@@ -449,6 +458,7 @@ ctk.CTkButton(btn_frame, text="Ejecutar  (Ctrl+Enter)",
               corner_radius=15, fg_color="#25DA43",
               font=FONT_SUB, text_color="#000000",
               command=ejecutar_analisis).pack(side="left", padx=6)
+
  
 # Consola de entrada 
 consola_wrapper = ctk.CTkFrame(main_frame, fg_color=COLOR_PANEL, corner_radius=8)
